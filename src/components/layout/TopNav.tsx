@@ -41,7 +41,7 @@ export default function TopNav({
   }, []);
 
   return (
-    <header className="fixed top-0 right-0 left-0 lg:left-72 z-30 theme-pane backdrop-blur-2xl h-16 flex items-center justify-between px-5 lg:px-8 border-b">
+    <header className="fixed top-0 right-0 left-0 lg:left-64 z-30 theme-pane backdrop-blur-2xl h-16 flex items-center justify-between px-4 lg:px-5 xl:px-6 border-b">
       <div className="hidden md:flex items-center gap-6 font-headline tracking-tight">
         {quickLinks.map((link) => {
           const active =

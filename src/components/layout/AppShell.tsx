@@ -36,7 +36,7 @@ export default function AppShell({
         theme={theme}
         onToggleTheme={onToggleTheme}
       />
-      <main className="lg:ml-72 pt-24 px-5 lg:px-8 pb-12 min-h-screen">{children}</main>
+      <main className="lg:ml-64 pt-24 px-4 lg:px-5 xl:px-6 pb-12 min-h-screen">{children}</main>
     </div>
   );
 }

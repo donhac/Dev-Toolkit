@@ -15,7 +15,7 @@ export default function CategoryPage({ category, tools, onNavigate }: CategoryPa
   const Icon = meta.icon;
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-[96rem] mx-auto">
       <div className="mb-10">
         <div className="flex items-center gap-3 text-secondary mb-3">
           <Icon className="w-5 h-5" />

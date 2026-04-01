@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Copy, Lock, LockOpen, WandSparkles } from "lucide-react";
+import { Copy, Lock, LockOpen } from "lucide-react";
 import { api } from "../../services/api";
 import CopyToast from "../ui/CopyToast";
 import { useClipboardFeedback } from "../../hooks/useClipboardFeedback";
@@ -32,7 +32,6 @@ export default function Base64Tool() {
           encode: "编码",
           mode: "模式",
           processing: "处理中",
-          apiRoute: "共享 API 路径",
           inputLabel: "输入内容",
           outputLabel: "输出内容",
           conversionFailed: "转换失败",
@@ -51,7 +50,6 @@ export default function Base64Tool() {
           encode: "Encode",
           mode: "Mode",
           processing: "processing",
-          apiRoute: "Shared API route",
           inputLabel: "Input",
           outputLabel: "Output",
           conversionFailed: "Conversion failed",
@@ -84,11 +82,11 @@ export default function Base64Tool() {
     <div className="grid grid-cols-1 xl:grid-cols-[1fr_auto_1fr] gap-6 items-stretch">
       <div className="tool-panel flex flex-col">
         <div className="flex items-center justify-between mb-3">
-          <div>
+          <div className="flex items-center gap-2">
             <p className="tool-label">{text.input}</p>
-            <p className="text-[11px] text-on-surface-variant mt-1">
+            <span className="inline-flex items-center rounded-full bg-secondary/10 px-2 py-0.5 text-[10px] font-semibold text-secondary">
               {input.length} {text.chars}
-            </p>
+            </span>
           </div>
           <button
             type="button"
@@ -172,11 +170,16 @@ export default function Base64Tool() {
 
       <div className="tool-panel flex flex-col">
         <div className="flex items-center justify-between mb-3">
-          <div>
+          <div className="flex items-center gap-2 flex-wrap">
             <p className="tool-label">{text.output}</p>
-            <p className="text-[11px] text-on-surface-variant mt-1">
-              {text.mode}: {mode} {loading ? `• ${text.processing}` : ""}
-            </p>
+            <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+              {text.mode}: {mode}
+            </span>
+            {loading ? (
+              <span className="inline-flex items-center rounded-full bg-tertiary/10 px-2 py-0.5 text-[10px] font-semibold text-tertiary">
+                {text.processing}
+              </span>
+            ) : null}
           </div>
           <button
             type="button"
@@ -194,10 +197,6 @@ export default function Base64Tool() {
           placeholder={text.placeholderOutput}
           spellCheck={false}
         />
-        <div className="mt-4 flex items-center gap-2 text-xs text-on-surface-variant">
-          <WandSparkles className="w-4 h-4 text-primary" />
-          {text.apiRoute}: `/api/tools/base64`
-        </div>
       </div>
       <CopyToast toast={toast} />
     </div>

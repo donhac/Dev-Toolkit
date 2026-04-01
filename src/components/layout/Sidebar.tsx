@@ -20,8 +20,8 @@ const categoryOrder: ToolCategory[] = [
 export default function Sidebar({ route, onNavigate }: SidebarProps) {
   const { language } = useI18n();
   return (
-    <aside className="hidden lg:flex h-screen w-72 fixed left-0 top-0 flex-col py-6 z-40 border-r theme-pane">
-      <div className="px-6 mb-10">
+    <aside className="hidden lg:flex h-screen w-64 fixed left-0 top-0 flex-col py-5 z-40 border-r theme-pane">
+      <div className="px-5 mb-8">
         <button
           type="button"
           onClick={() => onNavigate({ kind: "dashboard" })}
@@ -39,7 +39,7 @@ export default function Sidebar({ route, onNavigate }: SidebarProps) {
         </button>
       </div>
 
-      <nav className="flex-1 space-y-1 px-4">
+      <nav className="flex-1 space-y-1 px-3">
         {categoryOrder.map((category) => {
           const meta = getLocalizedCategoryMeta(category, language);
           const Icon = meta.icon;
@@ -69,7 +69,7 @@ export default function Sidebar({ route, onNavigate }: SidebarProps) {
               whileHover={{ x: 4 }}
               type="button"
               onClick={() => onNavigate(nextRoute)}
-              className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm ${
+              className={`w-full flex items-center justify-between gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 text-sm ${
                 active
                   ? "bg-primary/10 text-primary border border-primary/15"
                   : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"

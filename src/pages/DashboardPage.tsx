@@ -16,7 +16,7 @@ export default function DashboardPage({ onNavigate }: DashboardPageProps) {
   const dashboardStats = getLocalizedDashboardStats(language);
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-[96rem] mx-auto">
       <div className="mb-10">
         <h2 className="text-4xl font-headline font-bold text-on-surface tracking-tight mb-2">
           {uiMessages[language].workspaceTitle}

@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { Copy, Download, ImageUp, Upload } from "lucide-react";
 import CopyToast from "../ui/CopyToast";
 import { useClipboardFeedback } from "../../hooks/useClipboardFeedback";
+import { useI18n } from "../../i18n";
 
 function formatBytes(bytes: number) {
   if (!Number.isFinite(bytes) || bytes <= 0) {
@@ -16,6 +17,7 @@ function formatBytes(bytes: number) {
 }
 
 export default function ImageCompressorTool() {
+  const { language } = useI18n();
   const { copy, isCopied, toast } = useClipboardFeedback();
   const inputRef = useRef<HTMLInputElement>(null);
   const [sourceFile, setSourceFile] = useState<File | null>(null);
@@ -27,6 +29,57 @@ export default function ImageCompressorTool() {
   const [format, setFormat] = useState("image/jpeg");
   const [error, setError] = useState("");
 
+  const text =
+    language === "zh-CN"
+      ? {
+          unableToRead: "无法读取所选图片。",
+          unableToDecode: "无法解析该图片。",
+          canvasUnavailable: "当前浏览器不支持画布压缩。",
+          compressionFailed: "图片压缩失败。",
+          dropTitle: "拖入图片开始压缩",
+          dropDesc: "在本地调整格式、质量和最大宽度，减少文件体积。",
+          chooseImage: "选择图片",
+          quality: "质量",
+          maxWidth: "最大宽度",
+          outputFormat: "输出格式",
+          preview: "预览",
+          compressedPreviewAlt: "压缩预览",
+          sourcePreviewAlt: "原图预览",
+          previewPlaceholder: "压缩后的预览会显示在这里。",
+          original: "原图",
+          compressed: "压缩后",
+          sizeReduction: "体积缩减",
+          compress: "开始压缩",
+          download: "下载结果",
+          previewUrl: "预览地址",
+          copiedPreviewUrl: "已复制预览地址",
+          copyPreviewUrl: "复制预览地址",
+        }
+      : {
+          unableToRead: "Unable to read the selected image.",
+          unableToDecode: "Unable to decode the image.",
+          canvasUnavailable: "Canvas compression is not available in this browser.",
+          compressionFailed: "Image compression failed.",
+          dropTitle: "Drop an image to compress",
+          dropDesc: "Reduce file size locally with adjustable format, quality, and max width.",
+          chooseImage: "Choose Image",
+          quality: "Quality",
+          maxWidth: "Max Width",
+          outputFormat: "Output Format",
+          preview: "Preview",
+          compressedPreviewAlt: "Compressed preview",
+          sourcePreviewAlt: "Source preview",
+          previewPlaceholder: "Compressed output preview will appear here.",
+          original: "Original",
+          compressed: "Compressed",
+          sizeReduction: "Size Reduction",
+          compress: "Compress",
+          download: "Download",
+          previewUrl: "Preview URL",
+          copiedPreviewUrl: "Copied Preview URL",
+          copyPreviewUrl: "Copy Preview URL",
+        };
+
   async function handleFile(file: File) {
     setError("");
     setSourceFile(file);
@@ -35,7 +88,7 @@ export default function ImageCompressorTool() {
 
     const reader = new FileReader();
     reader.onload = () => setSourcePreview(typeof reader.result === "string" ? reader.result : "");
-    reader.onerror = () => setError("Unable to read the selected image.");
+    reader.onerror = () => setError(text.unableToRead);
     reader.readAsDataURL(file);
   }
 
@@ -52,7 +105,7 @@ export default function ImageCompressorTool() {
 
       await new Promise<void>((resolve, reject) => {
         image.onload = () => resolve();
-        image.onerror = () => reject(new Error("Unable to decode the image."));
+        image.onerror = () => reject(new Error(text.unableToDecode));
       });
 
       const ratio = image.width > maxWidth ? maxWidth / image.width : 1;
@@ -64,7 +117,7 @@ export default function ImageCompressorTool() {
       const context = canvas.getContext("2d");
 
       if (!context) {
-        throw new Error("Canvas compression is not available in this browser.");
+        throw new Error(text.canvasUnavailable);
       }
 
       context.drawImage(image, 0, 0, width, height);
@@ -74,13 +127,13 @@ export default function ImageCompressorTool() {
       });
 
       if (!blob) {
-        throw new Error("Image compression failed.");
+        throw new Error(text.compressionFailed);
       }
 
       setCompressedBlob(blob);
       setCompressedPreview(URL.createObjectURL(blob));
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Image compression failed.");
+      setError(requestError instanceof Error ? requestError.message : text.compressionFailed);
     }
   }
 
@@ -114,11 +167,11 @@ export default function ImageCompressorTool() {
           <div className="w-16 h-16 rounded-full bg-primary/12 flex items-center justify-center mb-6">
             <Upload className="text-primary w-8 h-8" />
           </div>
-          <h3 className="text-2xl font-headline font-bold text-on-surface mb-2">Drop an image to compress</h3>
+          <h3 className="text-2xl font-headline font-bold text-on-surface mb-2">{text.dropTitle}</h3>
           <p className="text-on-surface-variant text-sm mb-6">
-            Reduce file size locally with adjustable format, quality, and max width.
+            {text.dropDesc}
           </p>
-          <span className="secondary-button">Choose Image</span>
+          <span className="secondary-button">{text.chooseImage}</span>
           <input
             ref={inputRef}
             type="file"
@@ -136,7 +189,7 @@ export default function ImageCompressorTool() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="tool-panel">
             <div className="flex items-center justify-between mb-3">
-              <label className="tool-label">Quality</label>
+              <label className="tool-label">{text.quality}</label>
               <span className="text-primary font-mono">{Math.round(quality * 100)}%</span>
             </div>
             <input
@@ -150,7 +203,7 @@ export default function ImageCompressorTool() {
           </div>
 
           <div className="tool-panel">
-            <label className="tool-label mb-3 block">Max Width</label>
+            <label className="tool-label mb-3 block">{text.maxWidth}</label>
             <input
               type="number"
               value={maxWidth}
@@ -162,7 +215,7 @@ export default function ImageCompressorTool() {
           </div>
 
           <div className="tool-panel">
-            <label className="tool-label mb-3 block">Output Format</label>
+            <label className="tool-label mb-3 block">{text.outputFormat}</label>
             <select value={format} onChange={(event) => setFormat(event.target.value)} className="tool-input">
               <option value="image/jpeg">JPEG</option>
               <option value="image/webp">WEBP</option>
@@ -176,15 +229,15 @@ export default function ImageCompressorTool() {
         <section className="tool-panel">
           <div className="flex items-center gap-3 mb-4">
             <ImageUp className="w-4 h-4 text-secondary" />
-            <span className="tool-label">Preview</span>
+            <span className="tool-label">{text.preview}</span>
           </div>
           <div className="aspect-video rounded-[1.75rem] bg-surface-container-lowest border border-outline-variant/12 overflow-hidden flex items-center justify-center">
             {compressedPreview ? (
-              <img src={compressedPreview} alt="Compressed preview" className="max-h-full max-w-full object-contain" />
+              <img src={compressedPreview} alt={text.compressedPreviewAlt} className="max-h-full max-w-full object-contain" />
             ) : sourcePreview ? (
-              <img src={sourcePreview} alt="Source preview" className="max-h-full max-w-full object-contain" />
+              <img src={sourcePreview} alt={text.sourcePreviewAlt} className="max-h-full max-w-full object-contain" />
             ) : (
-              <p className="text-sm text-on-surface-variant">Compressed output preview will appear here.</p>
+              <p className="text-sm text-on-surface-variant">{text.previewPlaceholder}</p>
             )}
           </div>
         </section>
@@ -192,13 +245,13 @@ export default function ImageCompressorTool() {
         <section className="tool-panel">
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="rounded-2xl bg-surface-container-high px-4 py-4">
-              <p className="tool-label">Original</p>
+              <p className="tool-label">{text.original}</p>
               <p className="mt-3 text-lg font-semibold text-on-surface">
                 {sourceFile ? formatBytes(sourceFile.size) : "--"}
               </p>
             </div>
             <div className="rounded-2xl bg-surface-container-high px-4 py-4">
-              <p className="tool-label">Compressed</p>
+              <p className="tool-label">{text.compressed}</p>
               <p className="mt-3 text-lg font-semibold text-on-surface">
                 {compressedBlob ? formatBytes(compressedBlob.size) : "--"}
               </p>
@@ -206,25 +259,25 @@ export default function ImageCompressorTool() {
           </div>
 
           <div className="rounded-2xl bg-primary/10 border border-primary/15 px-4 py-4 text-sm">
-            <p className="tool-label text-primary">Size Reduction</p>
+            <p className="tool-label text-primary">{text.sizeReduction}</p>
             <p className="mt-2 text-2xl font-headline font-bold text-on-surface">{reduction}%</p>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
             <button type="button" onClick={() => void compressImage()} className="primary-button flex-1 justify-center">
-              Compress
+              {text.compress}
             </button>
             <button type="button" onClick={downloadResult} className="secondary-button flex-1 justify-center">
               <Download className="w-4 h-4" />
-              Download
+              {text.download}
             </button>
             <button
               type="button"
-              onClick={() => void copy(compressedPreview, "compressed-preview-url", "Preview URL")}
+              onClick={() => void copy(compressedPreview, "compressed-preview-url", text.previewUrl)}
               className="ghost-button w-full justify-center"
             >
               <Copy className="w-4 h-4" />
-              {isCopied("compressed-preview-url") ? "Copied Preview URL" : "Copy Preview URL"}
+              {isCopied("compressed-preview-url") ? text.copiedPreviewUrl : text.copyPreviewUrl}
             </button>
           </div>
 

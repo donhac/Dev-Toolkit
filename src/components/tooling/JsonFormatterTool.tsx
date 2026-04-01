@@ -6,9 +6,7 @@ import {
   Copy,
   Eye,
   EyeOff,
-  FileJson,
   Minimize2,
-  Sparkles,
 } from "lucide-react";
 import CopyToast from "../ui/CopyToast";
 import { useClipboardFeedback } from "../../hooks/useClipboardFeedback";
@@ -89,10 +87,10 @@ function JsonCodeSurface({
   }
 
   return (
-    <div className="tool-output min-h-[560px] flex-1 p-0 overflow-hidden">
+    <div className="tool-output min-h-[640px] flex-1 p-0 overflow-hidden">
       <div className="flex h-full">
         {showLineNumbers ? (
-          <div className="min-w-10 px-3 py-4 text-right text-on-surface-variant/35 select-none border-r border-outline-variant/10">
+          <div className="min-w-10 px-3 py-3 text-right text-on-surface-variant/35 select-none border-r border-outline-variant/10">
             {Array.from({ length: lineCount }, (_, index) => (
               <div key={`line-${index + 1}`} className="leading-7">
                 {index + 1}
@@ -104,7 +102,7 @@ function JsonCodeSurface({
         <div className="relative flex-1 overflow-hidden">
           <pre
             ref={overlayRef}
-            className={`absolute inset-0 m-0 overflow-auto px-5 py-4 text-sm leading-7 whitespace-pre-wrap break-words ${
+            className={`absolute inset-0 m-0 overflow-auto px-4 py-3 text-sm leading-7 whitespace-pre-wrap break-words ${
               editable ? "pointer-events-none" : ""
             }`}
           >
@@ -122,7 +120,7 @@ function JsonCodeSurface({
               onChange={(event) => onChange?.(event.target.value)}
               onScroll={syncScroll}
               spellCheck={false}
-              className="absolute inset-0 h-full w-full resize-none border-0 bg-transparent px-5 py-4 text-sm leading-7 text-transparent caret-on-surface outline-none"
+              className="absolute inset-0 h-full w-full resize-none border-0 bg-transparent px-4 py-3 text-sm leading-7 text-transparent caret-on-surface outline-none"
             />
           ) : null}
         </div>
@@ -255,7 +253,6 @@ export default function JsonFormatterTool() {
           formattedOutput: "格式化输出",
           placeholder: '{"paste": "在这里粘贴 JSON"}',
           compress: "压缩",
-          validate: "校验",
           escape: "\\ 转义",
           unescape: "取消转义",
           code: "代码",
@@ -265,7 +262,6 @@ export default function JsonFormatterTool() {
           collapseAll: "全部收起",
           expandAll: "全部展开",
           parseHint: "先解析有效 JSON，再查看可折叠树视图。",
-          footer: "本地格式化工具，支持代码视图、树视图、行号和转义处理。",
           outputPlaceholder: "格式化结果会显示在这里...",
           spaces2: "2 空格",
           spaces4: "4 空格",
@@ -287,7 +283,6 @@ export default function JsonFormatterTool() {
           formattedOutput: "Formatted Output",
           placeholder: '{"paste": "your JSON here"}',
           compress: "Compress",
-          validate: "Validate",
           escape: "\\ Escape",
           unescape: "Unescape",
           code: "Code",
@@ -297,7 +292,6 @@ export default function JsonFormatterTool() {
           collapseAll: "Collapse All",
           expandAll: "Expand All",
           parseHint: "Parse valid JSON to inspect a collapsible tree view.",
-          footer: "Local formatter with code view, tree view, line numbers, and escape utilities.",
           outputPlaceholder: "Formatted JSON will appear here...",
           spaces2: "2 spaces",
           spaces4: "4 spaces",
@@ -339,20 +333,6 @@ export default function JsonFormatterTool() {
       const next = JSON.stringify(parsed);
       setFormattedOutput(next);
       setStatus(text.minifiedJson);
-    } catch (requestError) {
-      setParsedJson(null);
-      setError(formatError(requestError));
-      setStatus(text.invalidJson);
-    }
-  }
-
-  function handleValidate() {
-    try {
-      setError("");
-      const parsed = parseInput();
-      setParsedJson(parsed);
-      setFormattedOutput(JSON.stringify(parsed, null, indent));
-      setStatus(text.validJson);
     } catch (requestError) {
       setParsedJson(null);
       setError(formatError(requestError));
@@ -446,29 +426,22 @@ export default function JsonFormatterTool() {
   const toolbarButtonClass = "toolbar-pill";
   const primaryToolbarButtonClass = "toolbar-pill toolbar-pill-primary";
   const secondaryToolbarButtonClass = "toolbar-pill toolbar-pill-secondary";
-  const tertiaryToolbarButtonClass = "toolbar-pill toolbar-pill-tertiary";
   const activeSegmentClass = "toolbar-pill toolbar-pill-primary";
   const inactiveSegmentClass = "toolbar-pill";
   const toolbarRowClass = "flex flex-wrap items-center gap-2 min-h-8";
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
-      <section className="xl:col-span-6 tool-panel flex flex-col">
-        <div className="flex flex-col gap-4 mb-4">
-          <div className="flex items-center justify-between min-h-7">
+    <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
+      <section className="xl:col-span-6 tool-panel flex flex-col px-5 py-5 md:px-6 md:py-5">
+        <div className="flex flex-col gap-3 mb-3">
+          <div className="flex items-center min-h-7">
             <label className="tool-label">{text.rawInput}</label>
-            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.18em] ${error ? "bg-error/12 text-error" : "bg-tertiary/12 text-tertiary"}`}>
-              {stats ? `${stats.nodes} ${text.nodes}` : status}
-            </span>
           </div>
 
           <div className={toolbarRowClass}>
             <button type="button" onClick={handleMinify} className={secondaryToolbarButtonClass}>
               <Minimize2 className="w-3.5 h-3.5" />
               {text.compress}
-            </button>
-            <button type="button" onClick={handleValidate} className={tertiaryToolbarButtonClass}>
-              {text.validate}
             </button>
             <button type="button" onClick={handleEscape} className={toolbarButtonClass}>
               {text.escape}
@@ -496,8 +469,8 @@ export default function JsonFormatterTool() {
         />
       </section>
 
-      <section className="xl:col-span-6 tool-panel flex flex-col">
-        <div className="flex flex-col gap-4 mb-4">
+      <section className="xl:col-span-6 tool-panel flex flex-col px-5 py-5 md:px-6 md:py-5">
+        <div className="flex flex-col gap-3 mb-3">
           <div className="flex items-center justify-between min-h-7">
             <label className="tool-label">{text.formattedOutput}</label>
             <div className="flex items-center gap-3">
@@ -567,7 +540,7 @@ export default function JsonFormatterTool() {
             placeholder={text.outputPlaceholder}
           />
         ) : (
-          <div className="tool-output min-h-[560px] flex-1">
+          <div className="tool-output min-h-[640px] flex-1">
             {parsedJson ? (
               <JsonTreeNode
                 value={parsedJson}
@@ -583,12 +556,6 @@ export default function JsonFormatterTool() {
             )}
           </div>
         )}
-
-        <div className="mt-4 flex items-center gap-2 text-xs text-on-surface-variant">
-          <FileJson className="w-4 h-4 text-secondary" />
-          <Sparkles className="w-4 h-4 text-primary" />
-          {text.footer}
-        </div>
       </section>
       <CopyToast toast={toast} />
     </div>
