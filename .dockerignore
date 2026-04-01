@@ -5,3 +5,7 @@ npm-debug.log
 .git
 .gitignore
 README.md
+docs
+LICENSE
+.env
+.env.*

@@ -200,7 +200,7 @@ docker build -t devtoolkit .
 ### 运行容器
 
 ```bash
-docker run --rm -p 3000:3000 devtoolkit
+docker run -d --name devtoolkit -p 3000:3000 devtoolkit
 ```
 
 ### 使用 docker-compose
