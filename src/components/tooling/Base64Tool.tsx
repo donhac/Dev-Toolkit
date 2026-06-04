@@ -8,7 +8,7 @@ import { useI18n } from "../../i18n";
 export default function Base64Tool() {
   const { language } = useI18n();
   const { copy, isCopied, toast } = useClipboardFeedback();
-  const [input, setInput] = useState("Hello, DevToolkit.");
+  const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [mode, setMode] = useState<"encode" | "decode">("encode");
   const [urlSafe, setUrlSafe] = useState(false);
@@ -24,7 +24,7 @@ export default function Base64Tool() {
           chars: "字符",
           copyInput: "复制输入",
           copyOutput: "复制输出",
-          placeholderInput: "粘贴原始文本或 Base64 内容...",
+          placeholderInput: "Hello, DevToolkit.",
           placeholderOutput: "转换结果会显示在这里...",
           autoDetect: "自动识别",
           urlSafe: "URL-safe",
@@ -42,7 +42,7 @@ export default function Base64Tool() {
           chars: "chars",
           copyInput: "Copy input",
           copyOutput: "Copy output",
-          placeholderInput: "Paste your source text or Base64 payload here...",
+          placeholderInput: "Hello, DevToolkit.",
           placeholderOutput: "Your transformed output will appear here...",
           autoDetect: "Auto-detect",
           urlSafe: "URL-safe",
@@ -100,7 +100,7 @@ export default function Base64Tool() {
         <textarea
           value={input}
           onChange={(event) => setInput(event.target.value)}
-          className="tool-textarea min-h-[360px]"
+          className="tool-textarea min-h-[360px] placeholder:text-on-surface-variant/45"
           placeholder={text.placeholderInput}
           spellCheck={false}
         />

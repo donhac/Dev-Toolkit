@@ -4,6 +4,7 @@ import CronExpressionTool from "../components/tooling/CronExpressionTool";
 import ImageCompressorTool from "../components/tooling/ImageCompressorTool";
 import ImageToBase64Tool from "../components/tooling/ImageToBase64Tool";
 import JsonFormatterTool from "../components/tooling/JsonFormatterTool";
+import JwtDebuggerTool from "../components/tooling/JwtDebuggerTool";
 import RandomGeneratorTool from "../components/tooling/RandomGeneratorTool";
 import RegexTesterTool from "../components/tooling/RegexTesterTool";
 import TimestampConverterTool from "../components/tooling/TimestampConverterTool";
@@ -42,6 +43,9 @@ export default function ToolPage({ tool, onNavigate }: ToolPageProps) {
       break;
     case "cron-expression-generator":
       content = <CronExpressionTool />;
+      break;
+    case "jwt-debugger":
+      content = <JwtDebuggerTool />;
       break;
     default:
       content = (

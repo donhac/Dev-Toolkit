@@ -149,13 +149,13 @@ export const tools: ToolDefinition[] = [
   {
     slug: "jwt-debugger",
     title: "JWT Debugger",
-    shortDescription: "Decode and inspect JWT payloads securely.",
+    shortDescription: "Decode, edit, and verify JSON Web Tokens locally.",
     description:
-      "Reserved integration slot for token inspection and signature verification in the next backend iteration.",
+      "Inspect JWT headers and claims, rebuild tokens from JSON, and verify HS256 signatures with an optional secret.",
     category: "security",
     variant: "primary",
     icon: Lock,
-    status: "Planned",
+    status: "Local Tool",
     tags: ["jwt", "token", "security"],
   },
 ];
@@ -252,8 +252,8 @@ const toolTranslations = {
     },
     "jwt-debugger": {
       title: "JWT 调试器",
-      shortDescription: "安全地解码并查看 JWT Payload。",
-      description: "为下一阶段的 Token 检查与签名校验预留的工具位。",
+      shortDescription: "在本地解码、编辑并校验 JSON Web Token。",
+      description: "查看 JWT Header 与 Payload，编辑 JSON 后重新生成 Token，并可用 Secret 校验 HS256 签名。",
     },
   },
   en: {},

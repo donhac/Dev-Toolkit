@@ -1,8 +1,78 @@
-import { useState } from "react";
-import { Copy, RefreshCw } from "lucide-react";
+import { useEffect, useState } from "react";
+import { RefreshCw } from "lucide-react";
 import CopyToast from "../ui/CopyToast";
 import { useClipboardFeedback } from "../../hooks/useClipboardFeedback";
 import { useI18n } from "../../i18n";
+
+const RANDOM_GENERATOR_CACHE_KEY = "dev-toolkit:random-generator";
+const MAX_HISTORY_ITEMS = 12;
+
+interface RandomGeneratorCache {
+  length: number;
+  count: number;
+  includeUppercase: boolean;
+  includeLowercase: boolean;
+  includeDigits: boolean;
+  includeSymbols: boolean;
+  batch: string[];
+  history: string[];
+}
+
+const defaultCache: RandomGeneratorCache = {
+  length: 16,
+  count: 1,
+  includeUppercase: true,
+  includeLowercase: true,
+  includeDigits: true,
+  includeSymbols: true,
+  batch: [],
+  history: [],
+};
+
+function clampNumber(value: unknown, min: number, max: number, fallback: number) {
+  const nextValue = Number(value);
+  if (!Number.isFinite(nextValue)) {
+    return fallback;
+  }
+
+  return Math.min(max, Math.max(min, Math.round(nextValue)));
+}
+
+function normalizeStringList(value: unknown, maxItems: number) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.filter((item): item is string => typeof item === "string" && item.length > 0).slice(0, maxItems);
+}
+
+function readCachedState(): RandomGeneratorCache {
+  if (typeof window === "undefined") {
+    return defaultCache;
+  }
+
+  try {
+    const cachedValue = window.localStorage.getItem(RANDOM_GENERATOR_CACHE_KEY);
+    if (!cachedValue) {
+      return defaultCache;
+    }
+
+    const parsed = JSON.parse(cachedValue) as Partial<RandomGeneratorCache>;
+
+    return {
+      length: clampNumber(parsed.length, 4, 128, defaultCache.length),
+      count: clampNumber(parsed.count, 1, 50, defaultCache.count),
+      includeUppercase: typeof parsed.includeUppercase === "boolean" ? parsed.includeUppercase : defaultCache.includeUppercase,
+      includeLowercase: typeof parsed.includeLowercase === "boolean" ? parsed.includeLowercase : defaultCache.includeLowercase,
+      includeDigits: typeof parsed.includeDigits === "boolean" ? parsed.includeDigits : defaultCache.includeDigits,
+      includeSymbols: typeof parsed.includeSymbols === "boolean" ? parsed.includeSymbols : defaultCache.includeSymbols,
+      batch: normalizeStringList(parsed.batch, 50),
+      history: normalizeStringList(parsed.history, MAX_HISTORY_ITEMS),
+    };
+  } catch {
+    return defaultCache;
+  }
+}
 
 function generateRandomValue(length: number, charset: string) {
   const values = new Uint32Array(length);
@@ -13,16 +83,18 @@ function generateRandomValue(length: number, charset: string) {
 export default function RandomGeneratorTool() {
   const { language } = useI18n();
   const { copy, isCopied, toast } = useClipboardFeedback();
-  const [length, setLength] = useState(16);
-  const [count, setCount] = useState(1);
-  const [includeUppercase, setIncludeUppercase] = useState(true);
-  const [includeLowercase, setIncludeLowercase] = useState(true);
-  const [includeDigits, setIncludeDigits] = useState(true);
-  const [includeSymbols, setIncludeSymbols] = useState(true);
-  const [value, setValue] = useState("u7K#m9P!xR2w@zL5");
-  const [batch, setBatch] = useState<string[]>(["u7K#m9P!xR2w@zL5"]);
-  const [history, setHistory] = useState<string[]>([]);
+  const [cachedState] = useState(readCachedState);
+  const [length, setLength] = useState(cachedState.length);
+  const [count, setCount] = useState(cachedState.count);
+  const [includeUppercase, setIncludeUppercase] = useState(cachedState.includeUppercase);
+  const [includeLowercase, setIncludeLowercase] = useState(cachedState.includeLowercase);
+  const [includeDigits, setIncludeDigits] = useState(cachedState.includeDigits);
+  const [includeSymbols, setIncludeSymbols] = useState(cachedState.includeSymbols);
+  const [batch, setBatch] = useState<string[]>(cachedState.batch);
+  const [history, setHistory] = useState<string[]>(cachedState.history);
   const [error, setError] = useState("");
+  const primaryValue = batch[0] ?? "";
+  const hasMultipleResults = batch.length > 1;
 
   const text =
     language === "zh-CN"
@@ -40,6 +112,9 @@ export default function RandomGeneratorTool() {
           symbols: "符号",
           recentResults: "最近结果",
           historyHint: "生成后可在这里快速复制最近结果。",
+          emptyResult: "点击重新生成后，这里会显示随机值。",
+          copyCurrent: "复制当前结果",
+          batchResult: "本次结果",
           randomValue: "随机值",
           historyValue: "历史值",
         }
@@ -57,9 +132,27 @@ export default function RandomGeneratorTool() {
           symbols: "Symbols",
           recentResults: "Recent Results",
           historyHint: "Generate values to build a quick copy history.",
+          emptyResult: "Generate a new value to show results here.",
+          copyCurrent: "Copy current result",
+          batchResult: "Batch results",
           randomValue: "Random value",
           historyValue: "History value",
         };
+
+  useEffect(() => {
+    const nextCache: RandomGeneratorCache = {
+      length,
+      count,
+      includeUppercase,
+      includeLowercase,
+      includeDigits,
+      includeSymbols,
+      batch,
+      history,
+    };
+
+    window.localStorage.setItem(RANDOM_GENERATOR_CACHE_KEY, JSON.stringify(nextCache));
+  }, [batch, count, history, includeDigits, includeLowercase, includeSymbols, includeUppercase, length]);
 
   function generate() {
     setError("");
@@ -76,9 +169,8 @@ export default function RandomGeneratorTool() {
     }
 
     const nextBatch = Array.from({ length: count }, () => generateRandomValue(length, charset));
-    setValue(nextBatch[0] ?? "");
     setBatch(nextBatch);
-    setHistory((current) => [...nextBatch, ...current].slice(0, 8));
+    setHistory((current) => [...nextBatch, ...current].slice(0, MAX_HISTORY_ITEMS));
   }
 
   return (
@@ -86,38 +178,44 @@ export default function RandomGeneratorTool() {
       <div className="col-span-12 lg:col-span-8 tool-panel">
         <div className="flex justify-between items-center mb-6">
           <h3 className="tool-label">{text.generatedResult}</h3>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => void copy(value, "random-primary", text.randomValue)}
-              className={`icon-button ${isCopied("random-primary") ? "copy-button-active" : ""}`}
-            >
-              <Copy className="w-4 h-4" />
-            </button>
-          </div>
         </div>
-        <div className="bg-surface-container-high rounded-2xl p-10 min-h-[180px] flex items-center justify-center">
-          <p className="text-4xl md:text-5xl font-mono text-on-surface break-all text-center tracking-tight leading-normal">
-            {value}
-          </p>
-        </div>
-        {batch.length > 1 ? (
-          <div className="mt-5 grid gap-3">
+        {hasMultipleResults ? (
+          <div className="grid gap-3">
+            <div className="flex items-center justify-between rounded-2xl bg-surface-container-high px-4 py-3">
+              <span className="tool-label">{text.batchResult}</span>
+              <span className="font-mono text-sm font-bold text-primary">{batch.length}</span>
+            </div>
             {batch.map((item, index) => (
-                <button
-                  key={`${item}-${index}`}
-                  type="button"
-                  onClick={() => void copy(item, `random-batch-${index}`, `${text.randomValue} #${index + 1}`)}
-                  className={`w-full rounded-2xl bg-surface-container-low px-4 py-4 text-left font-mono text-sm text-on-surface hover:bg-surface-container-high transition-colors ${
-                    isCopied(`random-batch-${index}`) ? "copied-item" : ""
-                  }`}
-                >
-                  <span className="tool-label">#{index + 1}</span>
+              <button
+                key={`${item}-${index}`}
+                type="button"
+                onClick={() => void copy(item, `random-batch-${index}`, `${text.randomValue} #${index + 1}`)}
+                className={`w-full rounded-2xl bg-surface-container-low px-4 py-4 text-left font-mono text-sm text-on-surface hover:bg-surface-container-high transition-colors ${
+                  isCopied(`random-batch-${index}`) ? "copied-item" : ""
+                }`}
+              >
+                <span className="tool-label">#{index + 1}</span>
                 <p className="mt-2 break-all">{item}</p>
               </button>
             ))}
           </div>
-        ) : null}
+        ) : (
+          <button
+            type="button"
+            onClick={() => (primaryValue ? void copy(primaryValue, "random-primary", text.copyCurrent) : undefined)}
+            className={`w-full bg-surface-container-high rounded-2xl p-10 min-h-[180px] flex items-center justify-center transition-colors hover:bg-surface-container-highest ${
+              isCopied("random-primary") ? "copied-item" : ""
+            }`}
+          >
+            <p
+              className={`text-4xl md:text-5xl font-mono break-all text-center tracking-tight leading-normal ${
+                primaryValue ? "text-on-surface" : "text-on-surface-variant text-base md:text-lg"
+              }`}
+            >
+              {primaryValue || text.emptyResult}
+            </p>
+          </button>
+        )}
         <div className="mt-8 flex justify-center">
           <button type="button" onClick={generate} className="primary-button px-10 py-4 text-lg">
             {text.generateNew}

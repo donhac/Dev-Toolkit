@@ -52,12 +52,6 @@ export default function ToolCard({ tool, onOpen }: ToolCardProps) {
           <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${iconBg}`}>
             <Icon className={isLarge ? "w-7 h-7" : "w-6 h-6"} />
           </div>
-          {tool.status && (
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-tertiary/10 text-tertiary text-[10px] font-bold uppercase tracking-wider">
-              <div className="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse shadow-[0_0_5px_rgba(155,255,206,1)]" />
-              {tool.status}
-            </div>
-          )}
         </div>
 
         <h3 className={`${isLarge ? "text-2xl" : "text-lg"} font-headline font-bold mb-2`}>
