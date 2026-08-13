@@ -8,6 +8,7 @@ import JwtDebuggerTool from "../components/tooling/JwtDebuggerTool";
 import RandomGeneratorTool from "../components/tooling/RandomGeneratorTool";
 import RegexTesterTool from "../components/tooling/RegexTesterTool";
 import TimestampConverterTool from "../components/tooling/TimestampConverterTool";
+import UrlEncoderDecoderTool from "../components/tooling/UrlEncoderDecoderTool";
 import ToolScaffold from "../components/tooling/ToolScaffold";
 import type { AppRoute, ToolDefinition } from "../types/tool";
 
@@ -22,6 +23,9 @@ export default function ToolPage({ tool, onNavigate }: ToolPageProps) {
   switch (tool.slug) {
     case "base64-encoder-decoder":
       content = <Base64Tool />;
+      break;
+    case "url-encoder-decoder":
+      content = <UrlEncoderDecoderTool />;
       break;
     case "json-formatter":
       content = <JsonFormatterTool />;

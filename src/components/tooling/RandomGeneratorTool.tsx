@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Trash2 } from "lucide-react";
 import CopyToast from "../ui/CopyToast";
 import { useClipboardFeedback } from "../../hooks/useClipboardFeedback";
 import { useI18n } from "../../i18n";
@@ -111,6 +111,7 @@ export default function RandomGeneratorTool() {
           digits: "数字",
           symbols: "符号",
           recentResults: "最近结果",
+          clearHistory: "清空最近结果",
           historyHint: "生成后可在这里快速复制最近结果。",
           emptyResult: "点击重新生成后，这里会显示随机值。",
           copyCurrent: "复制当前结果",
@@ -131,6 +132,7 @@ export default function RandomGeneratorTool() {
           digits: "Digits",
           symbols: "Symbols",
           recentResults: "Recent Results",
+          clearHistory: "Clear recent results",
           historyHint: "Generate values to build a quick copy history.",
           emptyResult: "Generate a new value to show results here.",
           copyCurrent: "Copy current result",
@@ -293,7 +295,19 @@ export default function RandomGeneratorTool() {
         </section>
 
         <section className="tool-panel">
-          <h3 className="tool-label mb-4">{text.recentResults}</h3>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h3 className="tool-label">{text.recentResults}</h3>
+            {history.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => setHistory([])}
+                className="icon-button"
+                aria-label={text.clearHistory}
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            ) : null}
+          </div>
           <div className="space-y-3">
             {history.length > 0 ? (
               history.map((item, index) => (

@@ -18,6 +18,7 @@ import {
   Dices,
   ScanSearch,
   ImageUpscale,
+  Link,
 } from "lucide-react";
 import type { AppRoute, ToolCategory, ToolDefinition, ToolStat } from "../types/tool";
 import type { Language } from "../i18n";
@@ -67,6 +68,18 @@ export const tools: ToolDefinition[] = [
     featured: true,
     cardSize: "large",
     tags: ["base64", "encoding", "converter", "text"],
+  },
+  {
+    slug: "url-encoder-decoder",
+    title: "URL Encoder/Decoder",
+    shortDescription: "Encode and decode URLs, query values, and path segments safely.",
+    description:
+      "Transform complete URLs or individual components with standards-based percent encoding, clear errors, and local-only processing.",
+    category: "converters",
+    variant: "secondary",
+    icon: Link,
+    status: "Local Tool",
+    tags: ["url", "percent-encoding", "encode", "decode"],
   },
   {
     slug: "timestamp-converter",
@@ -162,9 +175,9 @@ export const tools: ToolDefinition[] = [
 
 export const dashboardStats: ToolStat[] = [
   { label: "Connected APIs", value: "5", tone: "secondary" },
-  { label: "Ready Tools", value: "8", tone: "primary" },
+  { label: "Ready Tools", value: "10", tone: "primary" },
   { label: "Shared Modules", value: "12", tone: "tertiary" },
-  { label: "Pending Slots", value: "1", tone: "error" },
+  { label: "Pending Slots", value: "0", tone: "error" },
 ];
 
 export const dashboardMetrics = [
@@ -214,6 +227,11 @@ const toolTranslations = {
       title: "Base64 编码/解码",
       shortDescription: "快速完成文本或二进制数据与 Base64 的双向转换。",
       description: "提供双栏工作区，支持文本与 Base64 转换、URL-safe 模式以及自动识别编码方向。",
+    },
+    "url-encoder-decoder": {
+      title: "URL 编码/解码",
+      shortDescription: "安全地编码和解码 URL、查询参数与路径片段。",
+      description: "支持完整 URL 与单个组件的百分号编码转换，提供明确错误提示，所有处理均在本地完成。",
     },
     "timestamp-converter": {
       title: "时间戳转换",
